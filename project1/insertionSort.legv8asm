@@ -1,7 +1,12 @@
 //Dylan Hampton, netid: dhampton
 //Initializing X9 to 800 since 8 bytes * 100, and X10 to 100
-ADDI X9, XZR, #0
-ADDI X10, XZR, #100
+ADDI X9, XZR, #0 //array addr
+ADDI X10, XZR, #100 //i for for loops
+ADDI X0, XZR, #100 //final
+SUBI X1, X0, #1 //i = final - 1
+//X2 is the parameter for pos
+//X3 is temp
+
 
 fill:
 //stores X10's value at X9's value in memory and subtracts 1 (8 bytes * 1), if X10 is not zero loop, else branch to main loop
@@ -14,6 +19,22 @@ CBZ X10, insertionSort
 
 
 insertionSort:
+DUMP
+
+rightShift:
+SUBS XZR, X1, X2
+B.GE target //if i >= pos branch to target
+BR LR //go back to call
+target:
+ADD X3, XZR, X1 //X3 = X1
+ADDI X3, XZR, #8 //X3 = X1 + 1
+STUR X3, [X1, #0] // arr[i+1] = arr[i]
+SUBI X1, X1, #1 //i--
+B rightShift //loop
+
+
+
+done:
 DUMP
 
 
