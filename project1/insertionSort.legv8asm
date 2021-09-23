@@ -1,0 +1,16 @@
+//Dylan Hampton, netid: dhampton
+//Initializing X9 to 800 since 8 bytes * 100, and X10 to 100
+ADDI X9, XZR, #800
+ADDI X10, XZR, #100
+
+fill:
+//stores X10's value at X9's value in memory and subtracts 1 (8 bytes * 1), if X10 is not zero loop, else branch to main loop
+STUR X10, [X9, #0]
+SUBI X9, X9, #8
+CBNZ X10, fill
+CBZ X10, insertionSort
+
+insertionSort:
+DUMP
+
+
