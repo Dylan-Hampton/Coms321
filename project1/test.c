@@ -13,7 +13,7 @@ int main()
   int arr2[] = {5,8,2,1,6,10,9,3};
 
   fill(arr);
-  
+  shiftRight(arr, 0, 100);
   printf("Before: ");
   for(int i = 0; i < 100; i++)
   {

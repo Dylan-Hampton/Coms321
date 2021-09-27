@@ -1,35 +1,47 @@
 //Dylan Hampton, netid: dhampton
-//Initializing X9 to 800 since 8 bytes * 100, and X10 to 100
+//Initializing X9 to 0, and X10 to 100
 ADDI X9, XZR, #0 //array addr
-ADDI X10, XZR, #100 //i for for loops
-ADDI X0, XZR, #100 //final
-SUBI X1, X0, #1 //i = final - 1
-//X2 is the parameter for pos
-//X3 is temp
+ADDI X10, XZR, #10 //i for for loops, change back to 100 for turn in
+BL fill //fill()
 
+ADDI X2, XZR, #0 //pos
+LSL X2, X2, #3 //pos*8
+ADDI X0, X0, #9 //i = final-1, change to 99 for turn in
+ADD X1, XZR, X0 //final - 1 without *8 
 
-fill:
-//stores X10's value at X9's value in memory and subtracts 1 (8 bytes * 1), if X10 is not zero loop, else branch to main loop
-STUR X10, [X9, #0]
-ADDI X9, X9, #8
-SUBI X10, X10, #1
-PRNT X10
-CBNZ X10, fill
-CBZ X10, insertionSort
 
 
 insertionSort:
-DUMP
+ADDI X9, XZR, #0 //setting array addr to start
+LSL X0, X0, #3 //i*8
+BL rightShift
+B done
+
+fill:
+//stores X10's value at X9's value in memory and subtracts 1 (8 bytes * 1), if X10 is not zero loop, else branch to main loop
+STUR X10, [X9, #0] //arr[X9] = i
+ADDI X9, X9, #8 //arr + 1
+SUBI X10, X10, #1 // i--
+//PRNT X10
+CBNZ X10, fill //if i != loop
+CBZ X10, fillDone //if i = 0, return to calling method
+
+fillDone:
+BR LR //return to caller
 
 rightShift:
 SUBS XZR, X1, X2
+PRNT X0
+PRNT X2
 B.GE target //if i >= pos branch to target
-BR LR //go back to call
+BR LR //return to calling function
 target:
-ADD X3, XZR, X1 //X3 = X1
-ADDI X3, XZR, #8 //X3 = X1 + 1
-STUR X3, [X1, #0] // arr[i+1] = arr[i]
-SUBI X1, X1, #1 //i--
+ADD X0, X9, X0 //addr+i
+//PRNT X0
+LDUR X2, [X0, #0] //X2 = arr[i]
+//PRNT X2
+STUR X2, [X0, #8] //arr[i+1] = arr[i]
+SUBI X0, X0, #8 //i--
 B rightShift //loop
 
 
