@@ -3,36 +3,51 @@
 ADDI X9, XZR, #0 //array addr
 ADDI X10, XZR, #10 //i for for loops, change back to 100 for turn in
 BL fill //fill()
-ADDI X2, XZR, #0 //pos
-LSL X2, X2, #3 //pos*8
+ADDI X2, XZR, #1 //pos = 1
 ADDI X0, X0, #9 //i = final-1, change to 99 for turn in
+LSL X0, X0, #3 //i*8
 ADD X1, XZR, X0 //final - 1 without *8
-ADDI X3, X1, #10 // final
-
-
+ADDI X3, X1, #10 // final / length
 
 insertionSort:
-ADDI X9, XZR, #0 //setting array addr to start
-LSL X0, X0, #3 //i*8
-//BL rightShift
+SUBS XZR, X2, X3
+B.LT insertionSortTarget//if pos(i for this loop) < length loop, else branch to end
+B done
+insertionSortTarget:
+SUBI SP, SP, #16 //make space in stack for pos and len
+STUR X2,[SP, #0] //store pos
+STUR X3,[SP,#8] //store length
+BL insertSortedPos
+ADDI SP,SP,#16
+B insertionSort
 
-SUBI SP,SP, #16//make stack space for 2 
-STUR X0,[SP,#0] //store i on stack
-STUR X1,[SP,#8] //store final - 1
+
+
+insertSortedPos:
+SUBI SP,SP, #24//make stack space for 3 registers
+STUR X0,[SP,#16] //store i on stack
+STUR X1,[SP,#24] //store final - 1
+STUR SP,[SP, #32] //store SP so it doesnt get overwritten
 SUB X0, X0, X0 // i = 0
 SUB X1, X1, X1 // i = 0 without *8
-LDUR X5,[X2, #0] //X5 = arr[pos]
+LDUR X5,[X2, #0] //X5 = arr[pos] i.e. v = arr[pos]
+ADD X8, X5, XZR // X8 = X5 so it doesnt get overwritten 
 
 BL findSortedPos
-SUB X5,X5,X5 //X5=0
-ADD X1, X1, X5 //X5 = p(index of sorted pos)
-LDUR X1,[SP,#8] //load final - 1
-LDUR X0,[SP,#0] //load i
-ADDI SP,SP,#16
+SUB X5,X5,X5 //X5 = 0
+ADD X1, X1, X5 //X5 = p(index of sorted pos) i.e. p = findSortedPos(arr,v,final)
+LDUR X1,[SP,#24] //load final - 1
+LDUR X0,[SP,#16] //load i
+ADDI SP,SP,#16 //return space to stack
 
+BL rightShift
 
+LDUR SP,[SP, #32] //replace SP so we can get back to insertionSort
+LSL X5, X5, #3 //p * 8 so we can get to &arr[p]
+STUR X8,[X5, #0] //arr[p] = v
 
-B done
+BR LR //return to calling function
+
 
 fill:
 //stores X10's value at X9's value in memory and subtracts 1 (8 bytes * 1), if X10 is not zero loop, else branch to main loop
@@ -42,32 +57,27 @@ SUBI X10, X10, #1 // i--
 //PRNT X10
 CBNZ X10, fill //if i != loop
 CBZ X10, fillDone //if i = 0, return to calling method
-
 fillDone:
 BR LR //return to caller
 
 rightShift:
-SUBS XZR, X1, X2
 PRNT X0
-PRNT X2
+SUBS XZR, X1, X5
 B.GE shiftTarget //if i >= pos branch to target
 BR LR //return to calling function
 shiftTarget:
-ADD X0, X9, X0 //addr+i
-//PRNT X0
+//ADD X0, X9, X0 //addr+i
 LDUR X2, [X0, #0] //X2 = arr[i]
-//PRNT X2
 STUR X2, [X0, #8] //arr[i+1] = arr[i]
-SUBI X0, X0, #8 //i--
+SUBI X0, X0, #8 //arr - 1
 B rightShift //loop
 
 findSortedPos:
 LDUR X4, [X0, #0] //X4 = arr[i]
-//PRNT X0
-//PRNT X4
 SUBS XZR, X1, X3
 B.LE findSortTarget //if i <= final loop
 BR LR //return to calling function
+
 findSortTarget:
 SUBS XZR, X4, X5 //X5 is val
 B.GE foundSorted // if arr[i] >= val return, else i++
