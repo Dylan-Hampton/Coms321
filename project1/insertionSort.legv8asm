@@ -1,8 +1,9 @@
 //Dylan Hampton, netid: dhampton
-//Initializing X9 to 0, and X10 to 100
+
 ADDI X9, XZR, #0 //array addr
-ADDI X10, XZR, #10 //i for for loops, change back to 100 for turn in
+ADDI X10, XZR, #9 //i for for loops, change back to 100 for turn in
 BL fill //fill()
+DUMP //before sorting
 ADDI X2, XZR, #1 //pos = 1
 ADDI X0, X0, #9 //i = final-1, change to 99 for turn in
 LSL X0, X0, #3 //i*8
@@ -62,11 +63,12 @@ BR LR //return to caller
 
 rightShift:
 PRNT X0
-SUBS XZR, X1, X5
+SUBS XZR, X0, X5
 B.GE shiftTarget //if i >= pos branch to target
 BR LR //return to calling function
 shiftTarget:
 //ADD X0, X9, X0 //addr+i
+//PRNT X0
 LDUR X2, [X0, #0] //X2 = arr[i]
 STUR X2, [X0, #8] //arr[i+1] = arr[i]
 SUBI X0, X0, #8 //arr - 1
