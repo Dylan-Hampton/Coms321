@@ -1,7 +1,7 @@
 //Dylan Hampton, netid: dhampton
 
 ADDI X9, XZR, #0 //array addr
-ADDI X10, XZR, #9 //i for for loops, change back to 100 for turn in
+ADDI X10, XZR, #10 //i for for loops, change back to 100 for turn in
 BL fill //fill()
 DUMP //before sorting
 ADDI X2, XZR, #1 //pos = 1
@@ -16,8 +16,8 @@ B.LT insertionSortTarget//if pos(i for this loop) < length loop, else branch to 
 B done
 insertionSortTarget:
 SUBI SP, SP, #16 //make space in stack for pos and len
-STUR X2,[SP, #0] //store pos
 STUR X3,[SP,#8] //store length
+STUR X2,[SP, #0] //store pos
 BL insertSortedPos
 ADDI SP,SP,#16
 B insertionSort
@@ -26,9 +26,10 @@ B insertionSort
 
 insertSortedPos:
 SUBI SP,SP, #24//make stack space for 3 registers
-STUR X0,[SP,#16] //store i on stack
+STUR LR,[SP, #32] //store LR so it doesnt get overwritten
 STUR X1,[SP,#24] //store final - 1
-STUR SP,[SP, #32] //store SP so it doesnt get overwritten
+STUR X0,[SP,#16] //store i on stack
+
 SUB X0, X0, X0 // i = 0
 SUB X1, X1, X1 // i = 0 without *8
 LDUR X5,[X2, #0] //X5 = arr[pos] i.e. v = arr[pos]
@@ -37,13 +38,17 @@ ADD X8, X5, XZR // X8 = X5 so it doesnt get overwritten
 BL findSortedPos
 SUB X5,X5,X5 //X5 = 0
 ADD X1, X1, X5 //X5 = p(index of sorted pos) i.e. p = findSortedPos(arr,v,final)
-LDUR X1,[SP,#24] //load final - 1
 LDUR X0,[SP,#16] //load i
-ADDI SP,SP,#16 //return space to stack
+LDUR X1,[SP,#24] //load final - 1
+//PRNT X0
+//PRNT X5
+
 
 BL rightShift
 
-LDUR SP,[SP, #32] //replace SP so we can get back to insertionSort
+//DUMP
+LDUR LR,[SP, #32] //replace SP so we can get back to insertionSort
+ADDI SP,SP,#24 //return space to stack
 LSL X5, X5, #3 //p * 8 so we can get to &arr[p]
 STUR X8,[X5, #0] //arr[p] = v
 
