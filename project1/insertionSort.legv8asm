@@ -1,100 +1,133 @@
 //Dylan Hampton, netid: dhampton
 
-ADDI X9, XZR, #0 //array addr
-ADDI X10, XZR, #10 //i for for loops, change back to 100 for turn in
-BL fill //fill()
-DUMP //before sorting
-ADDI X2, XZR, #1 //pos = 1
-ADDI X0, X0, #9 //i = final-1, change to 99 for turn in
-LSL X0, X0, #3 //i*8
-ADD X1, XZR, X0 //final - 1 without *8
-ADDI X3, X1, #10 // final / length
+main:
+ADDI X1, XZR, #0 //setting array address to 0
+ADDI X2, XZR, #10 //length of array
+
+SUBI SP, SP, #16 //make room for 2 registers on stack
+STUR X1, [SP, #0] //store both address and length
+STUR X2, [SP, #8] 
+
+BL fill //populate array
+DUMP //print out original unsorted array
+
+LDUR X2, [SP, #8] //restore stored registers
+LDUR X1, [SP, #0]
+ADDI SP, SP, #16 //give stack space back
+
+SUBI X2, X2, #1 //length - 1
+BL insertionSort //start the sorting
+
+B end //dumps out sorted array
 
 insertionSort:
-SUBS XZR, X2, X3
-B.LT insertionSortTarget//if pos(i for this loop) < length loop, else branch to end
-B done
-insertionSortTarget:
-SUBI SP, SP, #16 //make space in stack for pos and len
-STUR X3,[SP,#8] //store length
-STUR X2,[SP, #0] //store pos
+SUBI SP, SP, #32 //make room for 4 registers on the stack
+STUR X11, [SP, #0] //i
+STUR X2, [SP, #8] //length - 1
+STUR X1, [SP, #16] //address
+STUR LR, [SP, #24]
+
+ADD X3, X2, XZR //X3 = length-1 
+ADD X2, X11, XZR //X2 = i
+
 BL insertSortedPos
-ADDI SP,SP,#16
-B insertionSort
 
+LDUR LR, [SP, #24] //restore stored registers
+LDUR X1, [SP, #16]
+LDUR X2, [SP, #8]
+LDUR X11, [SP, #0]
+ADDI SP, SP, #32 //give stack space back
 
+SUB X18, X2, X11 //X18 = (length - 1) - i
+CBZ X18, insertionSortReturn //if X18 is 0 we are done with the array
+ADDI X11, X11, #1 //else i++
+B insertionSort //loop
+insertionSortReturn:
+BR LR
 
 insertSortedPos:
-SUBI SP,SP, #24//make stack space for 3 registers
-STUR LR,[SP, #32] //store LR so it doesnt get overwritten
-STUR X1,[SP,#24] //store final - 1
-STUR X0,[SP,#16] //store i on stack
+LSL X21, X2, #3 //X21 = X2 * 8 for address of arr[i]
+LDUR X11, [X21, #0] //X11 = arr[i]
 
-SUB X0, X0, X0 // i = 0
-SUB X1, X1, X1 // i = 0 without *8
-LDUR X5,[X2, #0] //X5 = arr[pos] i.e. v = arr[pos]
-ADD X8, X5, XZR // X8 = X5 so it doesnt get overwritten 
+SUBI SP, SP, #32 //make room for 4 registers on stack
+STUR X11, [SP, #0] //val
+STUR X2, [SP, #8] //i
+STUR X1, [SP, #16] //address
+STUR LR, [SP, #24]
+
+ADD X2, X11, XZR //X2 = val
 
 BL findSortedPos
-SUB X5,X5,X5 //X5 = 0
-ADD X1, X1, X5 //X5 = p(index of sorted pos) i.e. p = findSortedPos(arr,v,final)
-LDUR X0,[SP,#16] //load i
-LDUR X1,[SP,#24] //load final - 1
-//PRNT X0
-//PRNT X5
+
+ADD X18, X1, XZR //X18 = sorted pos index
+
+LDUR LR, [SP, #24] //restore stored registers
+LDUR X1, [SP, #16]
+LDUR X2, [SP, #8]
+LDUR X11, [SP, #0]
+ADDI SP, SP, #32 //give stack space back
+
+SUBI SP, SP, #40 //make room for 5 registers since we now have X18 holding pos
+STUR X18, [SP, #0] //store registers
+STUR X11, [SP, #8]
+STUR X2, [SP, #16]
+STUR X1, [SP, #24]
+STUR LR, [SP, #32]
+
+ADD X3, X2, XZR //X3 = X2
+ADD X2, X18, XZR //X2 = X18
+
+BL shiftRight
+
+LDUR LR, [SP, #32] //restore stored registers
+LDUR X1, [SP, #24]
+LDUR X2, [SP, #16]
+LDUR X11, [SP, #8]
+LDUR X18, [SP, #0]
+ADDI SP, SP, #40 //give stack space back
+
+LSL X18, X18, #3 //X18 = X18 * 8
+STUR X11, [X18, #0] //arr[pos] = val
+BR LR //return
 
 
-BL rightShift
+findSortedPos:
+LDUR X11, [X1, #0] //X11 = arr[X1]
 
-//DUMP
-LDUR LR,[SP, #32] //replace SP so we can get back to insertionSort
-ADDI SP,SP,#24 //return space to stack
-LSL X5, X5, #3 //p * 8 so we can get to &arr[p]
-STUR X8,[X5, #0] //arr[p] = v
+SUBS XZR, X11, X2
+B.GE findSortedPosReturn//if X11 >= X2 return
+ADDI X1, X1, #8//else arr address + 1
+B findSortedPos //loop
 
-BR LR //return to calling function
+findSortedPosReturn:
+BR LR
+
+
+shiftRight:
+SUB X11, X3, X2 //X11 = X3-X2
+CBZ X11, shiftRightReturn //if X11 is zero shift is done
+
+SUBI X3, X3, #1 //X3--
+LSL X1, X3, #3 //X1 = X3 * 8
+
+LDUR X18, [X1, #8] //X18 = arr[X1+1]
+LDUR X11, [X1, #0] //X11 = arr[X1]
+STUR X11, [X1, #8] //arr[X1+1] = arr[X1]
+B shiftRight
+
+shiftRightReturn:
+BR LR
 
 
 fill:
-//stores X10's value at X9's value in memory and subtracts 1 (8 bytes * 1), if X10 is not zero loop, else branch to main loop
-STUR X10, [X9, #0] //arr[X9] = i
-ADDI X9, X9, #8 //arr + 1
-SUBI X10, X10, #1 // i--
-//PRNT X10
-CBNZ X10, fill //if i != loop
-CBZ X10, fillDone //if i = 0, return to calling method
-fillDone:
-BR LR //return to caller
-
-rightShift:
-PRNT X0
-SUBS XZR, X0, X5
-B.GE shiftTarget //if i >= pos branch to target
-BR LR //return to calling function
-shiftTarget:
-//ADD X0, X9, X0 //addr+i
-//PRNT X0
-LDUR X2, [X0, #0] //X2 = arr[i]
-STUR X2, [X0, #8] //arr[i+1] = arr[i]
-SUBI X0, X0, #8 //arr - 1
-B rightShift //loop
-
-findSortedPos:
-LDUR X4, [X0, #0] //X4 = arr[i]
-SUBS XZR, X1, X3
-B.LE findSortTarget //if i <= final loop
-BR LR //return to calling function
-
-findSortTarget:
-SUBS XZR, X4, X5 //X5 is val
-B.GE foundSorted // if arr[i] >= val return, else i++
-ADDI X0, X0, #8
-ADDI X1, X1, #1
-B findSortedPos
-foundSorted:
+CBZ X2, fillReturn //check if array length is 0, if so we are done
+STUR X2, [X1, #0] //arr[i] = i
+SUBI X2, X2, #1 //i--
+ADDI X1, X1, #8 //move pointer over 1
+B fill //loop
+fillReturn: //return to calling procedure
 BR LR
 
-done:
-DUMP
-
+end:
+DUMP //prints out sorted array
 
