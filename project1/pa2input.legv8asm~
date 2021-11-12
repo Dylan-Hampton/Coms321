@@ -1,0 +1,34 @@
+ADD X1, X1, X2
+ADDI X1, X1, #4
+AND X3, X3, X4
+ANDI X3, X3, #3
+B branch
+branch:
+B.EQ branch1
+branch1:
+B.LE branch2
+branch2:
+BL branchLink:
+branchLink:
+BR X1
+CBNZ X2, branch3
+branch3:
+CBZ X2, branch4
+branch4:
+EOR X1, X2, X3
+EORI X1, X2, #6
+LDUR X2, [X1, #0]
+LSL X2, X2, #8
+LSR X3, X3, #8
+ORR X1, X2, X3
+ORRI X2, X3, #4
+STUR X1, [X2, #0]
+SUB X1, X2, X3
+SUBI X2, X3, #4
+SUBIS X1, X2, #4
+SUBS X1, X2, X3
+MUL X1, X2, X3
+PRNT X1
+PRNL
+DUMP
+HALT
