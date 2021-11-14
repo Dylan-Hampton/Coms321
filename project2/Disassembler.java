@@ -28,7 +28,7 @@ public class Disassembler {
             //System.out.println(eightBitOp);
             //System.out.println(tenBitOp);
             //System.out.println(tmp);
-            System.out.println(elvnBitOp);
+            //System.out.println(elvnBitOp);
 
             switch (sixBitOp)  //B type instructions
             {
@@ -57,11 +57,11 @@ public class Disassembler {
             }
 
 
-            int rdReg = Integer.parseInt(tmp.substring(27)); //0-4
-            int rnReg = Integer.parseInt(tmp.substring(22,27)); //5-9
-            int rmReg = Integer.parseInt(tmp.substring(12,17)); //16-20
-            int shamt = Integer.parseInt(tmp.substring(17,22)); //10-15
-            int dtAddr = Integer.parseInt(tmp.substring(12,22)); //for D types
+            int rdReg = Integer.parseInt(tmp.substring(27), 2); //0-4
+            int rnReg = Integer.parseInt(tmp.substring(22,27), 2); //5-9
+            int rmReg = Integer.parseInt(tmp.substring(12,17), 2); //16-20
+            int shamt = Integer.parseInt(tmp.substring(17,22), 2); //10-15
+            int dtAddr = Integer.parseInt(tmp.substring(12,22), 2); //for D types
             switch (elvnBitOp)  //R and D type instructions
             {
                 case "10001011000":
@@ -113,33 +113,45 @@ public class Disassembler {
 
     public static ArrayList<String> parseBinary(String inputFile)
     {
-        ArrayList<String> temp = new ArrayList<String>();
         ArrayList<String> instructions = new ArrayList<String>();
         int ch;
         try
         {
              FileInputStream inputStream = new FileInputStream(new File(inputFile));
-
+             int count = 0;
+             String line = "";
             while((ch = inputStream.read()) != -1)
             {
-                String tmp = Integer.toBinaryString((ch & 0xFF) + 0x100).substring(1); //does some magic to convert from byte to binary string
-                temp.add(tmp);
+                //does some magic to convert from byte to binary string
+                String tmp = String.format("%8s", Integer.toBinaryString(ch & 0xFF)).replace(' ', '0');
+                line += tmp;
+                if(count == 3)
+                {
+                    instructions.add(line); //add completed 32 bit instruction
+                    line = "";
+                    //line += tmp; //start new instruction
+                    count = 0;
+                }
+                else
+                {
+                    count++;
+                }
             }
 
             inputStream.close();
 
-            String tmp = "";
-            for(int i = 0; i < temp.size(); i += 4)
-            {
-                //not very graceful but it works
-                for(int j = 0; j < 4; j++)
-                {
-                    tmp += temp.get(i);
-                }
-                    instructions.add(tmp);
-                    tmp = "";
-            }
-
+//            String tmp = "";
+//            for(int i = 0; i < temp.size(); i += 4)
+//            {
+//                //not very graceful but it works
+//                for(int j = 0; j < 4; j++)
+//                {
+//                    tmp += temp.get(i);
+//                }
+//                    instructions.add(tmp);
+//                    tmp = "";
+//            }
+//
 //            for(int j = 0; j < instructions.size(); j++)
 //            {
 //                System.out.println(instructions.get(j));
