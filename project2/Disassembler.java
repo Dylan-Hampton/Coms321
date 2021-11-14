@@ -59,9 +59,9 @@ public class Disassembler {
 
             int rdReg = Integer.parseInt(tmp.substring(27), 2); //0-4
             int rnReg = Integer.parseInt(tmp.substring(22,27), 2); //5-9
-            int rmReg = Integer.parseInt(tmp.substring(12,17), 2); //16-20
-            int shamt = Integer.parseInt(tmp.substring(17,22), 2); //10-15
-            int dtAddr = Integer.parseInt(tmp.substring(12,22), 2); //for D types
+            int rmReg = Integer.parseInt(tmp.substring(10,16), 2); //16-20
+            int shamt = Integer.parseInt(tmp.substring(16,22), 2); //10-15
+            int dtAddr = Integer.parseInt(tmp.substring(10,20), 2); //for D types, 20-12
             switch (elvnBitOp)  //R and D type instructions
             {
                 case "10001011000":
@@ -152,10 +152,10 @@ public class Disassembler {
 //                    tmp = "";
 //            }
 //
-//            for(int j = 0; j < instructions.size(); j++)
-//            {
-//                System.out.println(instructions.get(j));
-//            }
+            for(int j = 0; j < instructions.size(); j++)
+            {
+                System.out.println(instructions.get(j));
+            }
         }
         catch(IOException e)
         {
