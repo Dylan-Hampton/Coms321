@@ -76,10 +76,10 @@ public class Disassembler {
             switch (sixBitOp)  //B type instructions
             {
                 case "000101":
-                    output = "B " + brAddress;
+                    output = "B " + "Label" + (i+brAddress);
                     break;
                 case "100101":
-                    output = "BL " + brAddress;
+                    output = "BL " + "Label" + (i+brAddress);
                     break;
                 default:
                     break;
@@ -92,54 +92,54 @@ public class Disassembler {
                     switch(rdReg) //rt is located in same place as rd
                     {
                         case 0:
-                            output = "B.EQ " + condBrAddress;
+                            output = "B.EQ " + "Label" + (i+condBrAddress);
                             break;
                         case 1:
-                            output = "B.NE " + condBrAddress;
+                            output = "B.NE " + "Label" + (i+condBrAddress);
                             break;
                         case 2:
-                            output = "B.HS " + condBrAddress;
+                            output = "B.HS " + "Label" + (i+condBrAddress);
                             break;
                         case 3:
-                            output = "B.LO " + condBrAddress;
+                            output = "B.LO " + "Label" + (i+condBrAddress);
                             break;
                         case 4:
-                            output = "B.MI " + condBrAddress;
+                            output = "B.MI " + "Label" + (i+condBrAddress);
                             break;
                         case 5:
-                            output = "B.PL " + condBrAddress;
+                            output = "B.PL " + "Label" + (i+condBrAddress);
                             break;
                         case 6:
-                            output = "B.VS " + condBrAddress;
+                            output = "B.VS " + "Label" + (i+condBrAddress);
                             break;
                         case 7:
-                            output = "B.VC " + condBrAddress;
+                            output = "B.VC " + "Label" + (i+condBrAddress);
                             break;
                         case 8:
-                            output = "B.HI " + condBrAddress;
+                            output = "B.HI " + "Label" + (i+condBrAddress);
                             break;
                         case 9:
-                            output = "B.LS " + condBrAddress;
+                            output = "B.LS " + "Label" + (i+condBrAddress);
                             break;
                         case 10:
-                            output = "B.GE " + condBrAddress;
+                            output = "B.GE " + "Label" + (i+condBrAddress);
                             break;
                         case 11:
-                            output = "B.LT " + condBrAddress;
+                            output = "B.LT " + "Label" + (i+condBrAddress);
                             break;
                         case 12:
-                            output = "B.GT " + condBrAddress;
+                            output = "B.GT " + "Label" + (i+condBrAddress);
                             break;
                         case 13:
-                            output = "B.LE " + condBrAddress;
+                            output = "B.LE " + "Label" + (i+condBrAddress);
                             break;
                     }
                     break;
                 case "10110100":
-                    output = "CBZ X" + rdReg + ", " + condBrAddress; //rt == rd
+                    output = "CBZ X" + rdReg + ", Label" + (i+condBrAddress); //rt == rd
                     break;
                 case "10110101":
-                    output = "CBNZ X" + rdReg + ", " + condBrAddress; //rt == rd
+                    output = "CBNZ X" + rdReg + ", Label" + (i+condBrAddress); //rt == rd
                     break;
                 default:
                     break;
@@ -225,6 +225,7 @@ public class Disassembler {
                     break;
             }
 
+            System.out.println("Label"+ (i) +":");
             System.out.println(output);
             output = "";
         }
@@ -276,10 +277,10 @@ public class Disassembler {
 //                    tmp = "";
 //            }
 //
-            for(int j = 0; j < instructions.size(); j++)
-            {
-                System.out.println(instructions.get(j));
-            }
+//            for(int j = 0; j < instructions.size(); j++)
+//            {
+//                System.out.println(instructions.get(j));
+//            }
         }
         catch(IOException e)
         {
