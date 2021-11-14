@@ -76,8 +76,10 @@ public class Disassembler {
             switch (sixBitOp)  //B type instructions
             {
                 case "000101":
-                    //find branch number somehow
                     output = "B " + brAddress;
+                    break;
+                case "100101":
+                    output = "BL " + brAddress;
                     break;
                 default:
                     break;
@@ -133,6 +135,12 @@ public class Disassembler {
                             break;
                     }
                     break;
+                case "10110100":
+                    output = "CBZ X" + rdReg + ", " + condBrAddress; //rt == rd
+                    break;
+                case "10110101":
+                    output = "CBNZ X" + rdReg + ", " + condBrAddress; //rt == rd
+                    break;
                 default:
                     break;
             }
@@ -145,6 +153,18 @@ public class Disassembler {
                     break;
                 case "1001001000":
                     output = "ANDI X" + rdReg + ", X" + rnReg + ", #" + aluImmediate;
+                    break;
+                case "1101000100":
+                    output = "SUBI X" + rdReg + ", X" + rnReg + ", #" + aluImmediate;
+                    break;
+                case "1101001000":
+                    output = "EORI X" + rdReg + ", X" + rnReg + ", #" + aluImmediate;
+                    break;
+                case "1011001000":
+                    output = "ORRI X" + rdReg + ", X" + rnReg + ", #" + aluImmediate;
+                    break;
+                case "1111000100":
+                    output = "SUBIS X" + rdReg + ", X" + rnReg + ", #" + aluImmediate;
                     break;
                 default:
                     break;
@@ -184,7 +204,22 @@ public class Disassembler {
                     output = "SUBS X" + rdReg + ", X" + rnReg + ", X" + rmReg;
                     break;
                 case "11010110000": //not sure what to do but "The branch target is encoded in the Rn field."
-                    output = "BR " + "X" + rdReg + ", X" + rnReg + ", X" + rmReg;
+                    output = "BR " + "X" + rnReg;
+                    break;
+                case "10011011000":
+                    output = "MUL " + "X" + rdReg + ", X" + rnReg + ", X" + rmReg;
+                    break;
+                case "11111111101":
+                    output = "PRNT X" + rdReg;
+                    break;
+                case "11111111100":
+                    output = "PRNL";
+                    break;
+                case "11111111110":
+                    output = "DUMP";
+                    break;
+                case "11111111111":
+                    output = "HALT";
                     break;
                 default:
                     break;
