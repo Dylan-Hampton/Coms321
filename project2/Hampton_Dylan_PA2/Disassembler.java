@@ -24,11 +24,7 @@ public class Disassembler {
             String eightBitOp = tmp.substring(0,8);
             String tenBitOp = tmp.substring(0,10);
             String elvnBitOp = tmp.substring(0,11);
-            //System.out.println(sixBitOp);
-            //System.out.println(eightBitOp);
-            //System.out.println(tenBitOp);
-            //System.out.println(tmp);
-            //System.out.println(elvnBitOp);
+
             //For R and D type instructions
             int rdReg = Integer.parseInt(tmp.substring(27), 2); //0-4
             int rnReg = Integer.parseInt(tmp.substring(22,27), 2); //5-9
@@ -38,7 +34,7 @@ public class Disassembler {
 
             //For I type instructions
             int aluImmediate;//10-21
-            if(tmp.charAt(10) == '1')
+            if(tmp.charAt(10) == '1') //if first bit of immediate is on, find twos comp and negate
             {
                 aluImmediate = Integer.parseInt(findTwoscomplement(new StringBuffer(tmp.substring(11,22))), 2);
                 aluImmediate *= -1;
@@ -203,7 +199,7 @@ public class Disassembler {
                 case "11101011000":
                     output = "SUBS X" + rdReg + ", X" + rnReg + ", X" + rmReg;
                     break;
-                case "11010110000": //not sure what to do but "The branch target is encoded in the Rn field."
+                case "11010110000":
                     output = "BR " + "X" + rnReg;
                     break;
                 case "10011011000":
@@ -229,11 +225,6 @@ public class Disassembler {
             System.out.println(output);
             output = "";
         }
-
-        //have switch cases for each length of opcode
-        //compare the opcodes to find right instruction then parse string to get registers and numbers
-        //print instruction
-        //repeat until end of file
     }
 
     public static ArrayList<String> parseBinary(String inputFile)
@@ -254,7 +245,6 @@ public class Disassembler {
                 {
                     instructions.add(line); //add completed 32 bit instruction
                     line = "";
-                    //line += tmp; //start new instruction
                     count = 0;
                 }
                 else
@@ -265,22 +255,6 @@ public class Disassembler {
 
             inputStream.close();
 
-//            String tmp = "";
-//            for(int i = 0; i < temp.size(); i += 4)
-//            {
-//                //not very graceful but it works
-//                for(int j = 0; j < 4; j++)
-//                {
-//                    tmp += temp.get(i);
-//                }
-//                    instructions.add(tmp);
-//                    tmp = "";
-//            }
-//
-//            for(int j = 0; j < instructions.size(); j++)
-//            {
-//                System.out.println(instructions.get(j));
-//            }
         }
         catch(IOException e)
         {
